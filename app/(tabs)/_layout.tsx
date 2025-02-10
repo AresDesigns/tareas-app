@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-
+import { StyleSheet } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -22,24 +22,36 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            ...styles.navigationBar,
           },
-          default: {},
+          default: {
+            ...styles.navigationBar,
+          },
         }),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Tareas',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="newTask"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Nueva tarea',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle" color={color} />,
         }}
       />
     </Tabs>
   );
 }
+const styles = StyleSheet.create({
+  navigationBar: {
+    minHeight: 70,
+    paddingBottom: 10, // Ajusta el padding según sea necesario
+    paddingTop: 10, // Ajusta el padding según sea necesario
+    borderTopWidth: 0.5,
+    borderTopColor: "#666",
+  },
+});
