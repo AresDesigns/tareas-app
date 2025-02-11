@@ -7,46 +7,31 @@ import { ThemedView } from '@/components/ThemedView';
 import  Task  from '@/components/Tasks/TaskListEmty';
 
 import  Task1  from '@/components/Tasks/TaskList';
+import { white } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
-  const api = 'http://localhost:80/server/api.php';
+  const api = "";
+    useEffect(() => {
+        fetch('http://localhost:80/server/api.php') // Ajusta TU_IP_LOCAL y el puerto si es necesario
+            .then(response => response.json())
+            .then(data => setTasks(data))
+            .catch(error => console.error('Error al recuperar los datos:', error));
+    }, []);
 
-  useEffect(() => {
-      fetch(api) // Ajusta TU_IP_LOCAL y el puerto si es necesario
-          .then(response => response.json())
-          .then(data => setTasks(data))
-          .catch(error => console.error('Error al recuperar los datos:',   error));
-          },[tasks.length]);
-
-
-
-
-  //Actualizamos los datos cuando creamos una nueva tarea:
 
 
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#e36d29', dark: '#2983e3' }}
-      >
-     
-     <ThemedView style={styles.titleContainer}>
-        <ThemedText  type="subtitle">Tareas</ThemedText>
-     </ThemedView>
-      
-      {tasks.length > 0 ? (
-        tasks.map((data, i) => {
-          return <Task1 key={i} data={data}  />;
-        })      
-      ) : (
-         <Task />      
-      )}
 
+    <View>
+    {tasks.map((item, index) => (
+        <Text style={styles.text} key={index}>{JSON.stringify(item)}</Text>
+    ))}
+</View>
+  
+  );} 
 
-    </ParallaxScrollView>
-  );
-};
 
 const styles = StyleSheet.create({
   parallaxScrollView: {
@@ -65,6 +50,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
+    color: "white",
     textAlign: "center",
     marginTop: 20,
   },

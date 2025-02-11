@@ -6,34 +6,38 @@ import {
   Text,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
-import Config from "@/server/config/api/config";
+import React, { useState,useEffect } from "react";
+import Config,{checkServerConnection, saveTask} from "@/server/config/api/config";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
-import { NavigationProp } from "@react-navigation/native";
-interface NewTaskProps {
-  navigation: NavigationProp<any>;
-}
+import { ThemedButton } from "../ThemedButton";
+import { useRouter } from 'expo-router';
 
-const NewTask: React.FC<NewTaskProps> = ({ navigation }) => {
-   const api = Config.api;
-
+const NewTask = ()=> {
+  const router = useRouter();
+   const api = 'http://localhost:80/server/v1/tasks/new-task.php';
+  console.log("NewTask", "la direccion es: " + api);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
   });
+  ;
+  useEffect(() => {
+  }, []);
 
   const handleChangeText = (name: string, value: string) => {
     setNewTask({ ...newTask, [name]: value });
   };
-
   const saveTask = async () => {
     const sendData = {
       title: newTask.title,
       description: newTask.description,
     };
+    checkServerConnection(api);
+    console.error("NewTask", "la direccion es: " + api + " y el sendData es: " + sendData);
 
-    await fetch(api + "new-task.php", {
+    await fetch(api, {
+      
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -41,23 +45,31 @@ const NewTask: React.FC<NewTaskProps> = ({ navigation }) => {
       },
       body: JSON.stringify(sendData),
     })
+
+
       .then((res) => res.json())
       .catch((error) => {
+        router.push('/');
         Alert.alert("Error!", "Inténtalo más tarde");
-        window.alert("Error: " + error);
+        window.alert("Error 1: " + error.message);
+        console.error("NewTask Error fecht", "la direccion es: " + api + " y el error es: " 
+          + error.message);
+       
       })
-      .then((response) => {
-        if (response.message == "error") {
-          Alert.alert("Error!", "Inténtalo más tarde");
-          window.alert("Error: " + response.message);
 
+      .then((response) => {
+        console.error('Headers:', Object.fromEntries(response.headers.entries()));
+
+        if (response.message == "error") {
+          console.error("Error 2: " + " entro en el error");
+          Alert.alert("Error!", "Inténtalo más tarde");
+          window.alert("Error 2: " + response.message);
         } else {
           //Redirigimos a tasks
-          navigation.navigate("Tareas", {state: true});
         }
       });
 
-    console.log(newTask);
+    console.error(newTask);
     setNewTask({
       title: "",
       description: "",
@@ -88,9 +100,16 @@ const NewTask: React.FC<NewTaskProps> = ({ navigation }) => {
             onChangeText={(value) => handleChangeText("description", value)}
           />
         </View>
-        <TouchableOpacity style={styles.button} onPress={saveTask}>
+      
+
+        <ThemedButton
+          style={styles.button}
+          lightColor="#3486eb"
+          darkColor="#5b34eb"
+          onPress={saveTask}
+        >
           <Text style={styles.textButton}>Guardar tarea</Text>
-        </TouchableOpacity>
+        </ThemedButton>
       </View>
     </View>
   );
@@ -124,7 +143,6 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#1f232b",
     padding: 12,
     marginTop: 0,
     borderRadius: 5,

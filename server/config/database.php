@@ -1,17 +1,24 @@
 <?php
 
-$server = '';
-$username = '';
+$server = 'localhost';
+$username = ' root';
 $password = '';
-$database = '';
-
-try{
-	//Almacenamos la conexión a la BDD:
-	$conn = new PDO("mysql:host=$server;dbname=$database;", $username, $password);
-
-}catch(PDOException $e){
-	//Si obtiene un error acabamos con el proceso y mostramos el error:
-	die('Connection failed: ' . $e->getMessage());
+$database = 'taskboarddb ';
+// Verificar conexión
+if (isset($_GET['check']) && $_GET['check'] === 'connection') {
+    try {
+        $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+        echo json_encode([
+            "status" => "success",
+            "message" => "Conexión establecida"
+        ]);
+    } catch(PDOException $e) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Error de conexión: " . $e->getMessage()
+        ]);
+    }
+    exit;
 }
 
 ?>
