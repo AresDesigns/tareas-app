@@ -1,30 +1,83 @@
 import { Image, StyleSheet, Platform, View ,Text, Alert} from 'react-native';
 import { useState, useEffect } from "react";
 import { HelloWave } from '@/components/HelloWave';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import  Task  from '@/components/Tasks/TaskListEmty';
+import  EmptyTask  from '@/components/Tasks/TaskListEmty';
+import { useRouter,useSegments } from 'expo-router';
 
-import  Task1  from '@/components/Tasks/TaskList';
+import  TaskList  from '@/components/Tasks/TaskList';
+// Define los tipos de parámetros de la ruta
+
 
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
-  const api = 'http://localhost:80/server/api.php';
-
+  const [error, setError] = useState<string | null>(null);
+const router = useRouter();
+const segments = useSegments();
+  const api = 'http://localhost:80/server/v1/tasks/get-tasks.php';
+  const apiDelete= 'http://localhost:80/server/v1/tasks/delete-task.php';
   useEffect(() => {
-      fetch(api) // Ajusta TU_IP_LOCAL y el puerto si es necesario
-          .then(response => response.json())
-          .then(data => setTasks(data))
-          .catch(error => console.error('Error al recuperar los datos:',   error));
-          },[tasks.length]);
+    getTasks();
+  }, [tasks.length]);
+
+    const getTasks = () => {
+    fetch(api)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                setError(data.error);
+            } else {
+              setTasks(data.tasks);
+            }
+        })
+        .catch(error => {
+            setError('Error al recuperar los datos');
+            console.error('Error al recuperar los datos:', error);
+        });
+};
+const deleteTask = async (id:any) => {
+  console.log(id);
+  const sendData = {
+    id: id,
+  };
+  await fetch(apiDelete, {
+    method: "POST",
+    headers: {
+      Accept: "application/json", 
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(sendData),
+  })
+    .then((res) => res.json())
+    .catch((error) => {
+      Alert.alert("Error!", "Inténtalo más tarde");
+    })
+    .then((response) => {
+      if (response.message == "error") {
+        Alert.alert("¡Error!", "No ha sido posible obtener el resultado");
+      } else {
+        //Obtenemos la respuesta del backend
+        getTasks();
+      }
+    });
+};
 
 
+    useEffect(() => {
+        const params = segments[segments.length - 1].split('?')[1];
+        const urlParams = new URLSearchParams(params);
+        const state = urlParams.get('state');
 
-
-  //Actualizamos los datos cuando creamos una nueva tarea:
-
-
+        if (state && state === 'true') {
+            getTasks();
+            // Actualiza la URL para evitar llamadas repetitivas a getTasks
+            const basePath = segments.slice(0, segments.length - 1).join('/');
+            router.push('/(tabs)/index?state=false');
+          }
+    },   [segments]);
 
   return (
     <ParallaxScrollView
@@ -37,10 +90,10 @@ export default function HomeScreen() {
       
       {tasks.length > 0 ? (
         tasks.map((data, i) => {
-          return <Task1 key={i} data={data}  />;
+          return <TaskList key={i} data={data} deleteTask={deleteTask}   />;
         })      
       ) : (
-         <Task />      
+        <EmptyTask />
       )}
 
 
@@ -63,7 +116,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-
+noDataText: {
+    fontSize: 16,
+    color: '#333',
+},
   text: {
     textAlign: "center",
     marginTop: 20,

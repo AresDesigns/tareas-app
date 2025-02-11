@@ -5,7 +5,7 @@ import {
     View,
   } from "react-native";
   
-  const Task = ({data} : {data:any}) => {
+  const Task = ({data} : {data:any},{deleteTask} : {deleteTask:any}) => {
     return (
       <View style={styles.item}>
         <Text style={styles.textDate}>{data.date_task}</Text>
@@ -16,6 +16,7 @@ import {
   
         <TouchableOpacity
           style={styles.button}
+          onPress={() => deleteTask(data.id)}
                  >
           <Text style={styles.textButton}>Eliminar</Text>
         </TouchableOpacity>
