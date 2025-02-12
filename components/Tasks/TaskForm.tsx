@@ -6,61 +6,62 @@ import {
   Text,
   Alert,
 } from "react-native";
-import React, { useState,useEffect } from "react";
-import Config,{checkServerConnection, saveTask} from "@/server/config/api/config";
+import React, { useState, useEffect } from "react";
+import Config, { checkServerConnection, saveTask } from "@/server/config/api/config";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import { ThemedButton } from "../ThemedButton";
 import { useRouter } from 'expo-router';
 
-const NewTask = ()=> {
+const NewTask = () => {
   const router = useRouter();
-const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-const [titleError, setTitleError] = useState(false);
-   const api = 'http://localhost:80/server/v1/tasks/new-task.php';
+  const [titleError, setTitleError] = useState(false);
+  const api = 'http://localhost:80/server/v1/tasks/new-task.php';
 
   ;
   useEffect(() => {
   }, []);
 
-  
+
   const saveTask = async () => {
-      if (title.trim() === '') {
-          setTitleError(true);
-          setError('El campo Título es obligatorio.');
-          return;
-      }
+    if (title.trim() === '') {
+      setTitleError(true);
+      setError('El campo Título es obligatorio.');
+      return;
+    }
     fetch('http://localhost:80/server/v1/tasks/new-task.php', {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ title, description })
-  })
-  //falta control de entrada no puede estar null el titulo
+    })
+      //falta control de entrada no puede estar null el titulo
       .then(response => response.json())
       .then(data => {
-          if (data.error) {
-              setError(data.error);
-              console.error("Error 2: " + " entro en el error");
-              Alert.alert("Error!", "Inténtalo más tarde");
-              window.alert("Error 2: " + data.message);
-          } else {
-              // Maneja la respuesta exitosa
-              router.push('/');  // Redirige a la pantalla de inicio
-              console.log('Tarea guardada:', data);
-              setTitle('');  // Limpiar el campo title
-              setDescription('');  // Limpiar el campo description
-          }
+        if (data.error) {
+          setError(data.error);
+          console.error("Error 2: " + " entro en el error");
+          Alert.alert("Error!", "Inténtalo más tarde");
+          window.alert("Error 2: " + data.message);
+        } else {
+          // Maneja la respuesta exitosa
+          router.push('/?state=true');  
+          // Redirige a la pantalla de inicio con el parámetro 'state=true'         
+           console.log('Tarea guardada:', data);
+          setTitle('');  // Limpiar el campo title
+          setDescription('');  // Limpiar el campo description
+        }
       })
-     
-        .catch(error => {
-          setError('Error al guardar la tarea');
-          console.error('Error al guardar la tarea:', error);
+
+      .catch(error => {
+        setError('Error al guardar la tarea');
+        console.error('Error al guardar la tarea:', error);
       });
-        
+
 
     /*console.error(newTask);
     setNewTask({
@@ -72,23 +73,25 @@ const [titleError, setTitleError] = useState(false);
 
   return (
     <View style={styles.container}>
-     <ThemedView style={styles.titleContainer}>
-             <ThemedText  type="subtitle">Crear nueva tarea</ThemedText>
-          </ThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="subtitle">Crear nueva tarea</ThemedText>
+      </ThemedView>
 
       <View style={styles.form}>
-        <View style={styles.inputGroup }>
+        <View style={styles.inputGroup}>
           <TextInput
-style={[styles.input, titleError && styles.inputError]}
-placeholder={titleError ? 'Ponga un título' : 'Título'}
-placeholderTextColor={titleError ? 'red' : 'gray'}
+            style={[styles.input, titleError && styles.inputError]}
+            placeholder={titleError ? 'Ponga un título' : 'Título'}
+            placeholderTextColor={titleError ? 'red' : 'gray'}
 
             value={title}
-            onChangeText={text => {setTitle(text);
+            onChangeText={text => {
+              setTitle(text);
               if (text.trim() !== '') {
-                  setTitleError(false);
-                  setError(null);
-              }}
+                setTitleError(false);
+                setError(null);
+              }
+            }
             }
           />
         </View>
@@ -99,17 +102,17 @@ placeholderTextColor={titleError ? 'red' : 'gray'}
             numberOfLines={12}
             style={{ textAlignVertical: "top" }}
             value={description}
-            onChangeText={ setDescription}
+            onChangeText={setDescription}
           />
         </View>
-      
+
 
         <ThemedButton
           style={styles.button}
           lightColor="#3486eb"
           darkColor="#5b34eb"
           onPress={saveTask}
-        >            
+        >
           <Text style={styles.textButton}>Guardar tarea</Text>
         </ThemedButton>
       </View>
@@ -131,13 +134,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
-},
-inputError: {
+  },
+  inputError: {
     borderColor: 'red',
-},
-errorText: {
+  },
+  errorText: {
     color: 'red',
-},
+  },
   title: {
     fontSize: 18,
     color: "#000",
@@ -145,7 +148,7 @@ errorText: {
     textAlign: "center",
   },
   form: {
-    
+
     padding: 40,
   },
   inputGroup: {

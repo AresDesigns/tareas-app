@@ -4,8 +4,12 @@ import {
     TouchableOpacity,
     View,
   } from "react-native";
-  
-  const Task = ({data} : {data:any},{deleteTask} : {deleteTask:any}) => {
+  interface TaskListProps {
+    data: any;
+    deleteTask: (id: any) => Promise<void>;
+}
+
+const TaskList: React.FC<TaskListProps> = ({ data, deleteTask }) => {
     return (
       <View style={styles.item}>
         <Text style={styles.textDate}>{data.date_task}</Text>
@@ -65,4 +69,4 @@ import {
     }
   });
   
-  export default Task;
+  export default TaskList;
