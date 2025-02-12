@@ -18,6 +18,7 @@ const NewTask = ()=> {
 const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+const [titleError, setTitleError] = useState(false);
    const api = 'http://localhost:80/server/v1/tasks/new-task.php';
 
   ;
@@ -26,7 +27,11 @@ const [error, setError] = useState<string | null>(null);
 
   
   const saveTask = async () => {
-   
+      if (title.trim() === '') {
+          setTitleError(true);
+          setError('El campo Título es obligatorio.');
+          return;
+      }
     fetch('http://localhost:80/server/v1/tasks/new-task.php', {
       method: 'POST',
       headers: {
@@ -74,9 +79,17 @@ const [error, setError] = useState<string | null>(null);
       <View style={styles.form}>
         <View style={styles.inputGroup }>
           <TextInput
-            placeholder="Título"
+style={[styles.input, titleError && styles.inputError]}
+placeholder={titleError ? 'Ponga un título' : 'Título'}
+placeholderTextColor={titleError ? 'red' : 'gray'}
+
             value={title}
-            onChangeText={setTitle}
+            onChangeText={text => {setTitle(text);
+              if (text.trim() !== '') {
+                  setTitleError(false);
+                  setError(null);
+              }}
+            }
           />
         </View>
         <View style={styles.inputGroup}>
@@ -112,6 +125,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+},
+inputError: {
+    borderColor: 'red',
+},
+errorText: {
+    color: 'red',
+},
   title: {
     fontSize: 18,
     color: "#000",
@@ -130,9 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fff",
   },
-  errorText: {
-    color: 'red',
-},
   button: {
     alignItems: "center",
     padding: 12,
