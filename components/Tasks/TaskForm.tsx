@@ -15,66 +15,55 @@ import { useRouter } from 'expo-router';
 
 const NewTask = ()=> {
   const router = useRouter();
+const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
    const api = 'http://localhost:80/server/v1/tasks/new-task.php';
-  console.log("NewTask", "la direccion es: " + api);
-  const [newTask, setNewTask] = useState({
-    title: "",
-    description: "",
-  });
+
   ;
   useEffect(() => {
   }, []);
 
-  const handleChangeText = (name: string, value: string) => {
-    setNewTask({ ...newTask, [name]: value });
-  };
+  
   const saveTask = async () => {
-    const sendData = {
-      title: newTask.title,
-      description: newTask.description,
-    };
-    checkServerConnection(api);
-    console.error("NewTask", "la direccion es: " + api + " y el sendData es: " + sendData);
-
-    await fetch(api, {
-      
-      method: "POST",
+   
+    fetch('http://localhost:80/server/v1/tasks/new-task.php', {
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+          'Content-Type': 'application/json'
       },
-      body: JSON.stringify(sendData),
-    })
-
-
-      .then((res) => res.json())
-      .catch((error) => {
-        router.push('/');
-        Alert.alert("Error!", "Inténtalo más tarde");
-        window.alert("Error 1: " + error.message);
-        console.error("NewTask Error fecht", "la direccion es: " + api + " y el error es: " 
-          + error.message);
-       
+      body: JSON.stringify({ title, description })
+  })
+  //falta control de entrada no puede estar null el titulo
+      .then(response => response.json())
+      .then(data => {
+          if (data.error) {
+              setError(data.error);
+              console.error("Error 2: " + " entro en el error");
+              Alert.alert("Error!", "Inténtalo más tarde");
+              window.alert("Error 2: " + data.message);
+          } else {
+              // Maneja la respuesta exitosa
+              router.push('/');  // Redirige a la pantalla de inicio
+              console.log('Tarea guardada:', data);
+              setTitle('');  // Limpiar el campo title
+              setDescription('');  // Limpiar el campo description
+          }
       })
-
-      .then((response) => {
-        console.error('Headers:', Object.fromEntries(response.headers.entries()));
-
-        if (response.message == "error") {
-          console.error("Error 2: " + " entro en el error");
-          Alert.alert("Error!", "Inténtalo más tarde");
-          window.alert("Error 2: " + response.message);
-        } else {
-          //Redirigimos a tasks
-        }
+     
+        .catch(error => {
+          setError('Error al guardar la tarea');
+          console.error('Error al guardar la tarea:', error);
       });
+        
 
-    console.error(newTask);
+    /*console.error(newTask);
     setNewTask({
       title: "",
       description: "",
-    });
+    });*/
   };
+
 
   return (
     <View style={styles.container}>
@@ -86,8 +75,8 @@ const NewTask = ()=> {
         <View style={styles.inputGroup }>
           <TextInput
             placeholder="Título"
-            value={newTask.title}
-            onChangeText={(value) => handleChangeText("title", value)}
+            value={title}
+            onChangeText={setTitle}
           />
         </View>
         <View style={styles.inputGroup}>
@@ -96,8 +85,8 @@ const NewTask = ()=> {
             multiline={true}
             numberOfLines={12}
             style={{ textAlignVertical: "top" }}
-            value={newTask.description}
-            onChangeText={(value) => handleChangeText("description", value)}
+            value={description}
+            onChangeText={ setDescription}
           />
         </View>
       
@@ -107,7 +96,7 @@ const NewTask = ()=> {
           lightColor="#3486eb"
           darkColor="#5b34eb"
           onPress={saveTask}
-        >
+        >            
           <Text style={styles.textButton}>Guardar tarea</Text>
         </ThemedButton>
       </View>
@@ -141,6 +130,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fff",
   },
+  errorText: {
+    color: 'red',
+},
   button: {
     alignItems: "center",
     padding: 12,

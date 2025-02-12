@@ -23,7 +23,7 @@ const segments = useSegments();
     getTasks();
   }, [tasks.length]);
 
-    const getTasks = () => {
+    const getTasks = async () => {
     fetch(api)
         .then(response => response.json())
         .then(data => {

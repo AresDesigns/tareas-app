@@ -4,7 +4,8 @@ const Config = ({
 })
 
 export default function checkPort() {
-    const ports = ["http://localhost:8082/", "http://localhost:8083/","http://localhost:8081/"]; // Agrega más puertos si es necesario
+  //añadimos los puertos donde alojen los servicios si es expo tiene que estar el backend fuera
+    const ports = ["http://localhost:80/", "http://localhost:443/","http://localhost:8081/"]; // Agrega más puertos si es necesario
     for (let port of ports) {
         if (isPortAvailable(port)) {
             return port;
