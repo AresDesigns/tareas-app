@@ -30,7 +30,16 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ 
+          //Esto es temporal , se debe cambiar por el icono de la app
+          //y ajustar el icono de login
+          //headerShown: false,
+          title: "Mis Tareas",
+          headerTitleAlign: "center",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
