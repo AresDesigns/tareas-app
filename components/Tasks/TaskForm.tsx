@@ -7,11 +7,12 @@ import {
   Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import Config, { checkServerConnection, saveTask } from "@/server/config/api/config";
+import ConfigApi, {getApiNew } from "@/api/config";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import { ThemedButton } from "../ThemedButton";
 import { useRouter } from 'expo-router';
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const NewTask = () => {
   const router = useRouter();
@@ -19,9 +20,10 @@ const NewTask = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [titleError, setTitleError] = useState(false);
-  const api = 'http://localhost:80/server/v1/tasks/new-task.php';
-
-  ;
+  const api = ConfigApi.api;
+  const apiNew = api + getApiNew();
+  const backgroundColor = useThemeColor({ light: "#D5D6D8", dark: "#ffffff" }, 'background');
+  
   useEffect(() => {
   }, []);
 
@@ -32,7 +34,7 @@ const NewTask = () => {
       setError('El campo Título es obligatorio.');
       return;
     }
-    fetch('http://localhost:80/server/v1/tasks/new-task.php', {
+    fetch(apiNew, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -78,10 +80,10 @@ const NewTask = () => {
       </ThemedView>
 
       <View style={styles.form}>
-        <View style={styles.inputGroup}>
+        <View style={[styles.inputGroup,{backgroundColor}]}>
           <TextInput
             style={[styles.input, titleError && styles.inputError]}
-            placeholder={titleError ? 'Ponga un título' : 'Título'}
+            placeholder={titleError ? 'Ponga un título (Campo obligatorio)' : '*Título'}
             placeholderTextColor={titleError ? 'red' : 'gray'}
 
             value={title}
@@ -95,7 +97,7 @@ const NewTask = () => {
             }
           />
         </View>
-        <View style={styles.inputGroup}>
+        <View style={[styles.inputGroup,{backgroundColor}]}>
           <TextInput
             placeholder="Descripción"
             multiline={true}
@@ -130,8 +132,6 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
   },
@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#cccccc",
     borderRadius: 5,
-    backgroundColor: "#fff",
   },
   button: {
     alignItems: "center",

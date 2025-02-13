@@ -1,23 +1,23 @@
 const Config = ({
-    API: checkPort()
-    
+    api: "http://localhost:80/"
 })
 
-export default function checkPort() {
-  //añadimos los puertos donde alojen los servicios si es expo tiene que estar el backend fuera
-    const ports = ["http://localhost:80/", "http://localhost:443/","http://localhost:8081/"]; // Agrega más puertos si es necesario
-    for (let port of ports) {
-        if (isPortAvailable(port)) {
-            return port;
-        }
-    }
-    return ports[0]; // Valor por defecto si no se encuentra ningún puerto disponible
-}
+const apiGet = 'server/v1/tasks/get-tasks.php';
+const apiDelete = 'server/v1/tasks/delete-task.php';
+const apiNew = 'server/v1/tasks/new-task.php';
+const apiUpdate = 'server/v1/tasks/update-task.php';
 
-function isPortAvailable(port) {
-    // Aquí puedes agregar la lógica para verificar si el puerto está disponible
-    // Por ejemplo, puedes hacer una solicitud HTTP y verificar la respuesta
-    return true; // Cambia esto según la lógica de verificación
+export function getApiGet(){
+  return apiGet;
+};
+export function getApiDelete(){
+  return apiDelete;
+};
+export function getApiNew(){
+  return apiNew;
+}
+export function getApiUpdate(){
+  return apiUpdate;
 }
 
 export const checkServerConnection = async (api) => {
@@ -62,6 +62,8 @@ export const checkServerConnection = async (api) => {
 function getApi() {
     return checkPort();
 }
+
+//funciones de fetch, pero no se estan usando, posible modulización
 export const saveTask = async (newTask) => {
     const res = await fetch(API, {
       method: "POST",
@@ -91,3 +93,5 @@ export const updateTask = async (taskId, newTask) => {
     console.log('Status Text:', res.statusText);
     return res;
   };
+
+  export default Config;

@@ -1,17 +1,22 @@
+import { useThemeColor } from "@/hooks/useThemeColor";
 import {
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
   } from "react-native";
+  import {ThemedText} from "@/components/ThemedText";
   interface TaskListProps {
     data: any;
     deleteTask: (id: any) => Promise<void>;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ data, deleteTask }) => {
+    const backgroundColor = useThemeColor({ light: "#D5D6D8", dark: "#ffffff" }, 'background');
+    const colorText = useThemeColor({ light: "#D5D6D8", dark: "#ffffff" },"text");
+
     return (
-      <View style={styles.item}>
+      <View style={[styles.item,{ backgroundColor }]}>
         <Text style={styles.textDate}>{data.date_task}</Text>
         <Text style={styles.title}>{data.title_task}</Text>
         <View style={styles.description}>
@@ -22,7 +27,7 @@ const TaskList: React.FC<TaskListProps> = ({ data, deleteTask }) => {
           style={styles.button}
           onPress={() => deleteTask(data.id)}
                  >
-          <Text style={styles.textButton}>Eliminar</Text>
+                  <ThemedText style={styles.textButton} lightColor="#000000" darkColor="#ffffff">Delete</ThemedText>
         </TouchableOpacity>
       </View>
     );
@@ -30,7 +35,6 @@ const TaskList: React.FC<TaskListProps> = ({ data, deleteTask }) => {
   
   const styles = StyleSheet.create({
     item: {
-      backgroundColor: "#f9f9f9",
       padding: 20,
       marginVertical: 8,
       marginHorizontal: 16,
@@ -46,7 +50,6 @@ const TaskList: React.FC<TaskListProps> = ({ data, deleteTask }) => {
       borderRadius: 5,
     },
     textButton: {
-      color: "#fff",
       padding: 5,
       textAlign: "center",
     },

@@ -6,6 +6,7 @@ import { ThemedView } from '@/components/ThemedView';
 import EmptyTask from '@/components/Tasks/TaskListEmty';
 import { useRouter, useSegments } from 'expo-router';
 import TaskList from '@/components/Tasks/TaskList';
+import ConfigApi, { getApiGet, getApiDelete } from '@/api/config';
 // Define los tipos de parámetros de la ruta
 
 
@@ -14,15 +15,16 @@ export default function HomeScreen() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const segments = useSegments();
-  const api = 'http://localhost:80/server/v1/tasks/get-tasks.php';
-  const apiDelete = 'http://localhost:80/server/v1/tasks/delete-task.php';
+  const api = ConfigApi.api
+  const apiGet = api + getApiGet();
+  const apiDelete = api + getApiDelete();
   useEffect(() => {
     getTasks();
   }, [tasks.length]);
 
 
   const getTasks = async () => {
-    fetch(api)
+    fetch(apiGet)
       .then(response => response.json())
       .then(data => {
         if (data.error) {
@@ -38,41 +40,43 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    const params = segments[segments.length - 1].split('?')[1];
-    const urlParams = new URLSearchParams(params);
-    const state = urlParams.get('state');
-    console.error("dentro");
-    getTasks();
-
-    if (state !=undefined && state == 'true') {
+    if (segments && segments.length > 0) {
+      console.error(segments);
       getTasks();
-      console.error("dentro");
-      // Actualiza la URL para evitar llamadas repetitivas a getTasks
-      router.push('/(tabs)/index?state=false');
     }
   }, [segments]);
 
-  const deleteTask = async (ide: number) => {
-    console.error("valor es" + ide);
-    const response = await fetch(apiDelete, {
-      method: "POST",
+  const deleteTask = async (id: number) => {
+    fetch(apiDelete, {
+      method: "post",
       headers: {
+        Accept: "application/json",
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ide: ide }),
+      body: JSON.stringify({ id: id }), // Ensure that the key is 'id'
     })
-
-    const data = await response.json();
-
-    if (data.message === 'error') {
-      Alert.alert('¡Error!', 'No ha sido posible obtener el resultado');
-      console.error('response bad 1', data.message);
-    } else {
-      // Obtenemos la respuesta del backend
-      console.error('response well', " Exitosa con id Json " + "  " + data + " con id de entrada: " + ide);
-      getTasks();
-    }
-
+      .then(response => response.text())
+      .then(text => {
+        console.error("2-Response text:", text); // Log to check the response text
+        try {
+          const data = JSON.parse(text);
+          console.error("3-Parsed data:", data); // Log to check the parsed data
+          if (data.success) {
+            console.error('response well', "Exitosa con id Json " + data.id + " con id de entrada: " + id);
+            getTasks();
+          } else {
+            Alert.alert('¡Error!', 'No ha sido posible obtener el resultado');
+            console.error('response bad 1', data.error);
+          }
+        } catch (e) {
+          Alert.alert('Error!', 'Inténtalo más tarde');
+          console.error('Error al parsear JSON:', text);
+        }
+      })
+      .catch(error => {
+        setError('Error al eliminar la tarea');
+        console.error('Error al eliminar la tarea:', error);
+      });
   };
 
   return (
