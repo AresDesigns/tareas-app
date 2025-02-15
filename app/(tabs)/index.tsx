@@ -91,11 +91,16 @@ if (task==true) {
 
   const handleTaskClick = (task:any) => {
     console.error(task);
+    const filteredTask = {
+      id: task.id,
+      title_task: task.title_task,
+      description_task: task.description_task,
+    };
     const tittle = task.title_task;
     console.log("id: "+task.id+" title: "+tittle+" description: "+task.description_task);
     router.push({
       pathname: '/updateTask',
-      params: { task: JSON.stringify(task)},
+      params: { task: JSON.stringify(filteredTask)},
     });
   };
 
