@@ -4,17 +4,22 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import EmptyTask from '@/components/Tasks/TaskListEmty';
-import { useRouter, useSegments } from 'expo-router';
+import { useRouter, useSegments,useLocalSearchParams } from 'expo-router';
 import TaskList from '@/components/Tasks/TaskList';
 import ConfigApi, { getApiGet, getApiDelete } from '@/api/config';
 // Define los tipos de parámetros de la ruta
-
+/*
+Falta incluir funcion para dirigir con expo-router hacia updateTask layout
+y pasar los datos de la tarea a editar
+*/
 
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const segments = useSegments();
+    const  params  = useLocalSearchParams();
+  
   const api = ConfigApi.api
   const apiGet = api + getApiGet();
   const apiDelete = api + getApiDelete();
@@ -38,12 +43,16 @@ export default function HomeScreen() {
         console.error('Error al recuperar los datos:', error);
       });
   };
-
+//Falta mejorar los parametros y control por url para refrescar, el state true se puede mejorar 
   useEffect(() => {
     if (segments && segments.length > 0) {
-      console.error(segments);
+
+      let task = typeof params.state === 'string' ? JSON.parse(params.state) : params.state;
+if (task==true) {
+      console.error(task);
       getTasks();
-    }
+      router.setParams({state: 'false'});
+    }}
   }, [segments]);
 
   const deleteTask = async (id: number) => {
@@ -63,6 +72,7 @@ export default function HomeScreen() {
           console.error("3-Parsed data:", data); // Log to check the parsed data
           if (data.success) {
             console.error('response well', "Exitosa con id Json " + data.id + " con id de entrada: " + id);
+            router.setParams({state: 'true'});
             getTasks();
           } else {
             Alert.alert('¡Error!', 'No ha sido posible obtener el resultado');
@@ -79,6 +89,21 @@ export default function HomeScreen() {
       });
   };
 
+  const handleTaskClick = (task:any) => {
+    console.error(task);
+    const filteredTask = {
+      id: task.id,
+      title_task: task.title_task,
+      description_task: task.description_task,
+    };
+    const tittle = task.title_task;
+    console.log("id: "+task.id+" title: "+tittle+" description: "+task.description_task);
+    router.push({
+      pathname: '/updateTask',
+      params: { task: JSON.stringify(filteredTask)},
+    });
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#e36d29', dark: '#2983e3' }}
@@ -89,7 +114,7 @@ export default function HomeScreen() {
 
       {tasks.length > 0 ? (
         tasks.map((data, ide) => {
-          return <TaskList key={ide} data={data} deleteTask={deleteTask} />;
+          return <TaskList key={ide} data={data} deleteTask={deleteTask} updateTask={() => handleTaskClick(data)} />;
         })
       ) : (
         <EmptyTask />

@@ -10,7 +10,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const showTab= false;
   return (
     <Tabs
       screenOptions={{
@@ -40,6 +40,15 @@ export default function TabLayout() {
         name="newTask"
         options={{
           title: 'Nueva tarea',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="updateTask"
+        options={{
+          //podriamos ocultar con href null
+          href: null,
+          title: 'Actualizar tarea',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="plus.circle" color={color} />,
         }}
       />
